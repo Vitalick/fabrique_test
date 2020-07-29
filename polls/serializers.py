@@ -37,3 +37,13 @@ class PollSerializer(serializers.ModelSerializer):
     class Meta:
         model = Poll
         fields = '__all__'
+
+
+class PollSerializerUpdate(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True, required=False)
+    votes = VoteSerializer(many=True, read_only=True, required=False)
+    start_date = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = Poll
+        fields = '__all__'
