@@ -12,7 +12,7 @@ class Poll(models.Model):
     title = models.CharField(max_length=100)
     start_date = models.DateTimeField()
     finish_date = models.DateTimeField()
-    description = models.TextField(max_length=500)
+    description = models.TextField(max_length=500, blank=True)
 
     def __str__(self):
         return self.title
@@ -51,6 +51,9 @@ class Answer(models.Model):
     text = models.CharField(max_length=200, blank=True)
     question = models.ForeignKey('Question', related_name='answers', on_delete=models.CASCADE)
     vote = models.ForeignKey('Vote', related_name='answers', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('question', 'vote')
 
     def __str__(self):
         if self.question.type == 'text':
