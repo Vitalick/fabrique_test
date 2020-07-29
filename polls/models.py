@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
+from django.utils.timezone import now
 
 ANSWER_TYPES = [
     ('text', 'Text answer'),
@@ -17,13 +19,21 @@ class Poll(models.Model):
     def __str__(self):
         return self.title
 
+    def is_active(self):
+        if self.start_date < now() < self.finish_date:
+            return True
+        return False
+
 
 class Vote(models.Model):
     poll = models.ForeignKey('Poll', on_delete=models.CASCADE)
-    voted_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    voted_by = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'{self.poll} - {self.voted_by.username}'
+        return f'{self.poll} - {self.voted_by}'
+
+    def get_absolute_url(self):
+        return reverse('vote_detail', kwargs={'pk': self.id})
 
     class Meta:
         unique_together = ('poll', 'voted_by')
@@ -47,7 +57,7 @@ class Choice(models.Model):
 
 
 class Answer(models.Model):
-    choice = models.ForeignKey('Choice', related_name='answers', blank=True, on_delete=models.CASCADE)
+    choices = models.ManyToManyField('Choice', related_name='answers', blank=True)
     text = models.CharField(max_length=200, blank=True)
     question = models.ForeignKey('Question', related_name='answers', on_delete=models.CASCADE)
     vote = models.ForeignKey('Vote', related_name='answers', on_delete=models.CASCADE)
@@ -59,4 +69,4 @@ class Answer(models.Model):
         if self.question.type == 'text':
             return f'{self.question.text} - {self.text}'
         else:
-            return f'{self.question.text} - {self.choice.text}'
+            return f'{self.question.text} - choices'
