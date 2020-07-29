@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  postgres_db:
+    image: postgres:12
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres_db
+  django:
+    container_name: fabrique_test
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: bash /usr/src/fabrique_test/devstart.sh
+    volumes:
+      - .:/usr/src/fabrique_test
+      - media:/usr/src/fabrique_test/media/
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres_db
+    environment:
+      DB_PASSWORD: 123456
+      DB_USER: postgres
+      DB_NAME: postgres_db
+      DB_ENGINE: django.db.backends.postgresql
+      DB_HOST: idaproject_db
+      DB_PORT: 5432
+
+volumes:
+  pg_data:
+  media:
