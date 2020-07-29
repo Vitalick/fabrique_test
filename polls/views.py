@@ -14,11 +14,12 @@ from .serializers import PollSerializer, QuestionSerializer, VoteSerializer, Cho
 class PollList(generics.ListCreateAPIView):
     serializer_class = PollSerializer
 
-    def get_queryset(self):
+    def get_queryset(self, user=None):
+        if user:
+            return Poll.objects.filter(vote__voted_by=user)
         if self.request.user.is_authenticated and self.request.user.is_staff:
             return Poll.objects.all()
-        else:
-            return Poll.objects.filter(start_date__lt=now(), finish_date__gt=now())
+        return Poll.objects.filter(start_date__lt=now(), finish_date__gt=now())
 
 
 class PollDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -37,6 +38,11 @@ class QuestionDetail(LoginRequiredMixin, generics.RetrieveUpdateDestroyAPIView):
 
 
 class ChoiceList(LoginRequiredMixin, generics.ListCreateAPIView):
+    queryset = Choice.objects.all()
+    serializer_class = ChoiceSerializer
+
+
+class ChoiceDetail(LoginRequiredMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Choice.objects.all()
     serializer_class = ChoiceSerializer
 

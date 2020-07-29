@@ -22,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AnswerSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Answer
         fields = '__all__'
@@ -52,7 +53,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class PollSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, required=False)
-    votes = VoteSerializer(many=True, read_only=True, required=False)
+    votes = VoteSerializer(many=True, read_only=True, required=False, )
 
     class Meta:
         model = Poll
